@@ -1,4 +1,6 @@
 open System.IO
+
+
 let removeComments (input: string) = input.Replace("//todo", "")
 let filePath = "./Lead.tsx"
 let todoLines = 
