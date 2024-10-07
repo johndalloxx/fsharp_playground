@@ -8,12 +8,12 @@ let findReposiotoryRoot () =
     let rec findRoot currentPath = 
         try 
             use repo = new Repository(currentPath)
-            repo.Info.WorkingDirectory
+            Some(repo.Info.WorkingDirectory)
         with
         | :? RepositoryNotFoundException ->
             let parentPath = Directory.GetParent(currentPath)
             if parentPath = null then
-                failwith "No Git repository found in any of the parent directories"
+                None
             else
                 findRoot parentPath.FullName
 
@@ -22,12 +22,17 @@ let findReposiotoryRoot () =
 
 [<EntryPoint>]
 let main _ =
-    let rootPath = findReposiotoryRoot ()
-    let repo = new Repository(rootPath)
-    printfn "%s" repo.Info.WorkingDirectory
-    let folders = Directory.GetDirectories(rootPath)
-    for entry in folders do
-        let files = Directory.GetFiles(entry)
-        for file in files do
-            printfn "%s" file
-    0 // return an integer exit code
+    match findReposiotoryRoot() with
+    | Some rootPath ->
+        let repo = new Repository(rootPath)
+        printfn "%s" repo.Info.WorkingDirectory
+
+        let folders = Directory.GetDirectories(rootPath)
+        for entry in folders do
+            let files = Directory.GetFiles(entry)
+            for file in files do
+                printfn "%s" file
+        0
+    | None ->
+        printfn "Error: No Git repository found in any of the parent directories."
+        1 
