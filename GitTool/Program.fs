@@ -20,6 +20,14 @@ let findReposiotoryRoot () =
     findRoot currentDirectory
 
 
+let processFileType (file: string) =
+    let extension = Path.GetExtension(file)
+    match extension with
+    | ".cs" -> printfn "C# file: %s" file
+    | ".fs" -> printfn "F# file: %s" file
+    | ".tsx" -> printfn "React file: %s" file
+    | _ ->  ()
+
 [<EntryPoint>]
 let main _ =
     match findReposiotoryRoot() with
@@ -31,7 +39,7 @@ let main _ =
         for entry in folders do
             let files = Directory.GetFiles(entry)
             for file in files do
-                printfn "%s" file
+                processFileType file
         0
     | None ->
         printfn "Error: No Git repository found in any of the parent directories."
